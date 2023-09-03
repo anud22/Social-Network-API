@@ -4,7 +4,9 @@ module.exports = {
   // Get all users
   async getUsers(req, res) {
     try {
-      const users = await User.find().select('-__v').populate('thoughts');
+      const users = await User.find().select('-__v').populate({
+        path: 'thoughts', select: '-__v'
+      });
       res.json(users);
     } catch (err) {
       res.status(500).json({ message: err.message });
@@ -14,7 +16,9 @@ module.exports = {
   async getSingleUser(req, res) {
     try {
       const user = await User.findOne({ _id: req.params.userId })
-        .select('-__v').populate('thoughts');
+        .select('-__v').populate({
+          path: 'thoughts', select: '-__v'
+        });
 
       if (!user) {
         return res.status(404).json({ message: 'No user with that ID' });
@@ -53,7 +57,7 @@ module.exports = {
           return res.status(404).json({ message: 'Thought did not delete ' + thought._id });
         }
       }
-     
+
 
       res.json({ message: 'User and associated thoughts deleted!' })
     } catch (err) {
