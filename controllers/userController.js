@@ -1,4 +1,4 @@
-const { User } = require('../models');
+const { User, Thought } = require('../models');
 
 module.exports = {
   // Get all users
@@ -36,15 +36,26 @@ module.exports = {
     }
 
   },
-  // Delete a user and associated apps
+  // Delete a user and associated thoughts
   async deleteUser(req, res) {
     try {
-      const user = await User.findOneAndDelete({ _id: req.params.userId });
+      const userId = req.params.userId;
+      const userData = await User.findOne({ _id: userId });
+      const user = await User.findOneAndDelete({ _id: userId });
       if (!user) {
         return res.status(404).json({ message: 'No user with that ID' });
       }
+      const thoughts = userData.thoughts;
+      for (const thought of thoughts) {
+        console.log(thought._id);
+        const result = await Thought.findOneAndDelete({ _id: thought._id });
+        if (!result) {
+          return res.status(404).json({ message: 'Thought did not delete ' + thought._id });
+        }
+      }
+     
 
-      res.json({ message: 'User and associated apps deleted!' })
+      res.json({ message: 'User and associated thoughts deleted!' })
     } catch (err) {
       res.status(500).json({ message: err.message });
     }
