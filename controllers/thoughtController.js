@@ -117,9 +117,9 @@ module.exports = {
             const {thoughtId, reactionId} = req.params;
             const thought = await Thought.findOneAndUpdate(
                 { _id: thoughtId },
-                { $pull: { reactions: { reactionId: reactionId } } },
+                { $pull: { reactions: { _id: reactionId } } },
                 { runValidators: true, new: true }
-            )
+            );
 
             if (!thought) {
                 return res.status(404).json({ message: 'No thought with this id!' });
