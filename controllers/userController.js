@@ -1,4 +1,4 @@
-const { User} = require('../models');
+const { User } = require('../models');
 
 module.exports = {
   // Get all users
@@ -7,7 +7,7 @@ module.exports = {
       const users = await User.find();
       res.json(users);
     } catch (err) {
-      res.status(500).json(err);
+      res.status(500).json({ message: err.message });
     }
   },
   // Get a single user
@@ -22,7 +22,7 @@ module.exports = {
 
       res.json(user);
     } catch (err) {
-      res.status(500).json(err);
+      res.status(500).json({ message: err.message });
     }
   },
   // create a new user
@@ -31,8 +31,10 @@ module.exports = {
       const user = await User.create(req.body);
       res.json(user);
     } catch (err) {
-      res.status(500).json(err);
+      console.error('Error creating user:', err);
+      res.status(500).json({ message: err.message });
     }
+
   },
   // Delete a user and associated apps
   async deleteUser(req, res) {
@@ -45,10 +47,10 @@ module.exports = {
 
       res.json({ message: 'User and associated apps deleted!' })
     } catch (err) {
-      res.status(500).json(err);
+      res.status(500).json({ message: err.message });
     }
   },
-  
+
   //Update a user
   async updateUser(req, res) {
     try {
@@ -65,53 +67,53 @@ module.exports = {
       res.json(user);
     } catch (err) {
       console.log(err);
-      res.status(500).json(err);
+      res.status(500).json({ message: err.message });
     }
   },
 
   //add a new friend to user's friend list
-  async createUserFriend(req, res){
-    try{
+  async createUserFriend(req, res) {
+    try {
       const user = await User.findOne(
         { _id: req.params.userId });
-        if (!user) {
-          return res.status(404).json({ message: 'User not found' });
-        }
-        if (user.friends.includes(friendId)) {
-          return res.status(400).json({ message: 'Friend already exists in the user\'s friend list' });
-        }
-        const friend = await User.findOne({ _id: friendId });
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      if (user.friends.includes(friendId)) {
+        return res.status(400).json({ message: 'Friend already exists in the user\'s friend list' });
+      }
+      const friend = await User.findOne({ _id: friendId });
 
-        if (!friend) {
-          return res.status(404).json({ message: 'Friend not found' });
-        }
-        user.friends.push(friendId);
-        await user.save();
-        res.json(user);
+      if (!friend) {
+        return res.status(404).json({ message: 'Friend not found' });
+      }
+      user.friends.push(friendId);
+      await user.save();
+      res.json(user);
 
     } catch (err) {
       console.log(err);
-      res.status(500).json(err);
+      res.status(500).json({ message: err.message });
     }
   },
-   //delete friend from user's friend list
-   async deleteUserFriend(req, res){
-    try{
+  //delete friend from user's friend list
+  async deleteUserFriend(req, res) {
+    try {
       const user = await User.findOne(
         { _id: req.params.userId });
-        if (!user) {
-          return res.status(404).json({ message: 'User not found' });
-        }
-        if (!user.friends.includes(friendId)) {
-          return res.status(400).json({ message: 'Friend does not exist in the user\'s friend list' });
-        }
-        user.friends = user.friends.filter(friend => friend.toString() !== friendId);
-        await user.save();
-        res.json(user);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      if (!user.friends.includes(friendId)) {
+        return res.status(400).json({ message: 'Friend does not exist in the user\'s friend list' });
+      }
+      user.friends = user.friends.filter(friend => friend.toString() !== friendId);
+      await user.save();
+      res.json(user);
 
     } catch (err) {
       console.log(err);
-      res.status(500).json(err);
+      res.status(500).json({ message: err.message });
     }
   }
 };
