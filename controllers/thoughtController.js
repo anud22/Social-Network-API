@@ -1,9 +1,9 @@
-const { Thought } = require('../models');
+const { Thought, User } = require('../models');
 module.exports = {
     // Get all thoughts
     async getThoughts(req, res) {
         try {
-            const thoughts = await Thought.find();
+            const thoughts = await Thought.find().select('-__v');;
             res.json(thoughts);
         } catch (err) {
             res.status(500).json({ message: err.message });
@@ -47,7 +47,7 @@ module.exports = {
     // Delete a thought 
     async deleteThought(req, res) {
         try {
-            const thought = await Thought.findOneAndDelete({ _id: req.params.userId });
+            const thought = await Thought.findOneAndDelete({ _id: req.params.thoughtId });
 
             if (!thought) {
                 return res.status(404).json({ message: 'No thought with that ID' });
