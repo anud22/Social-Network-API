@@ -40,7 +40,6 @@ module.exports = {
   async deleteUser(req, res) {
     try {
       const user = await User.findOneAndDelete({ _id: req.params.userId });
-
       if (!user) {
         return res.status(404).json({ message: 'No user with that ID' });
       }
@@ -74,15 +73,19 @@ module.exports = {
   //add a new friend to user's friend list
   async createUserFriend(req, res) {
     try {
+      const {userId, friendId} =  req.params;
+      if (userId === friendId) {
+        return res.status(404).json({ message: 'User and friend can not be same' });
+      }
       const user = await User.findOne(
-        { _id: req.params.userId });
+        { _id: userId });
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
       if (user.friends.includes(friendId)) {
         return res.status(400).json({ message: 'Friend already exists in the user\'s friend list' });
       }
-      const friend = await User.findOne({ _id: friendId });
+      const friend = await User.findOne({_id:friendId });
 
       if (!friend) {
         return res.status(404).json({ message: 'Friend not found' });
@@ -98,9 +101,10 @@ module.exports = {
   },
   //delete friend from user's friend list
   async deleteUserFriend(req, res) {
+    const {userId, friendId} =  req.params;
     try {
       const user = await User.findOne(
-        { _id: req.params.userId });
+        { _id: userId });
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
